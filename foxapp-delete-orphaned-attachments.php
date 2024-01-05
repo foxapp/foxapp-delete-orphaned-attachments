@@ -4,7 +4,7 @@
  * Plugin Name: FoxApp - Delete Orphaned Attachments
  * Plugin URI: https://plugins.foxapp.net/
  * Description: Deletes orphaned attachments not referenced in any post or page content.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: FoxApp
  * Author URI: https://plugins.foxapp.net/
  * Requires at least: 6.2
@@ -26,11 +26,17 @@ function foxapp_delete_orphaned_attachments() {
 		$attachment_in_content = get_posts( array(
 			'post_type'      => 'any',
 			'posts_per_page' => - 1,
-			's'              => $attachment_id,
+			's'              => wp_get_attachment_url($attachment_id),
 		) );
 
-		if ( empty( $attachment_in_content ) ) {
-			wp_delete_post( $attachment_id, true );
+		$elementor_templates = get_posts(array(
+			'post_type'      => 'elementor_library', // Elementor templates
+			'posts_per_page' => -1,
+			's'              => wp_get_attachment_url($attachment_id),
+		));
+
+		if (empty($attachment_in_content) && empty($elementor_templates)) {
+			wp_delete_post($attachment_id, true);
 		}
 	}
 }
